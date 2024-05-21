@@ -1,19 +1,18 @@
 import numpy as np
-import math
 from scipy.fft import dct, dctn
 import os
 import matplotlib.pyplot as plt
-import time
+import timeit
 
 # Per debugging
-debug = False
+debug = True
 
 
 def dct_custom(vector):
     # Inizializzo le variabili
     n = len(vector)
-    pi = math.pi
-    dtc = np.zeros(n)
+    pi = np.pi
+    dct = np.zeros(n)
     wk = np.zeros(n)
     cos_base = []  
     # K = 0 a n-1
@@ -21,24 +20,22 @@ def dct_custom(vector):
         # Vettori della base dei coseni
         for i in range(n):
             # Calcolo le componenti wki come cos(pi * k * (2 * i + 1) / (2 * n))
-            wk[i] = math.cos(pi * k * (2 * i + 1) / (2 * n))
+            wk[i] = np.cos(pi * k * (2 * i + 1) / (2 * n))
         # Normalizzazione ortho per confronto con la dct della libreria
         if k == 0:
             # Calcolo i coefficenti ak = (v * wk) / (wk * wk)
-            ak = np.dot(vector, wk) / math.sqrt(n)   # wk * wk
+            ak = np.dot(vector, wk) / np.sqrt(n)   # wk * wk
         else:
-            ak = np.dot(vector, wk) / math.sqrt(n/2) # wk * wk
+            ak = np.dot(vector, wk) / np.sqrt(n/2) # wk * wk
         # Salvo la base se debug
         if debug:
             cos_base.append(wk)
         # Aggiungo alla lista gli ak
-        dtc[k] = ak
+        dct[k] = ak
     # Plotto i coseni per freq k
-    if debug:
-        plot_cosine_base(cos_base)
-    return dtc
-
-
+    #if debug:
+        #plot_cosine_base(cos_base)
+    return dct
 
 def dct2_custom(matrix):
     # Creo una matrice di appoggio
@@ -53,14 +50,74 @@ def dct2_custom(matrix):
     # Rifaccio la traposta e ritorno la matrice
     return dct_matrix_col.T
 
+# DCT di SciPy
 def dct_library(vector):
+    # Equivalente a dct di matlab
     return dct(vector, 2, norm='ortho')
 
-
+# DCT2 di SciPy
 def dct2_library(matrix):
     return dctn(matrix, 2, norm='ortho')
 
 
+# Funzione per analizzare i tempi di esecuzione e generare il grafico
+def dct2_analize_graph():
+    matrices, N = generate_square_matrices(100, 300, 50)
+    # Calcolo i tempi di esecuzione per le 2 dct2
+    dct2_custom_times = measure_custom_dct2_times(matrices)
+    dct2_library_times = measure_library_dct2_times(matrices)
+    # Valori di riferimento n^3 e n^2 * log(n) normalizzati
+    n3 = (N ** 3) / 1e5
+    n2_logn = (N ** 2) * np.log(N) / 1e8
+    # Se debug
+    if debug:
+        write_times_to_file(dct2_custom_times, dct2_library_times)
+    # Creo un plot semilogy (logaritmico)
+    plt.figure()
+    plt.semilogy(N, dct2_custom_times, label='DCT2 Custom', color="tab:red")
+    plt.semilogy(N, dct2_library_times, label='DCT2 Library', color="tab:blue")
+    plt.semilogy(N, n3, label='N^3', color="tab:red", linestyle='dashed')
+    plt.semilogy(N, n2_logn, label='N^2 log(N)', color="tab:blue", linestyle='dashed')
+    plt.xlabel('Dimensione della Matrice NxN')
+    plt.ylabel('Tempo in secondi')
+    plt.title('Tempi della DCT2')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+
+# UTILITA'
+
+# Genera matrici NxN casuali di dimensione N = start_size fino a end_size aumentando con step
+def generate_square_matrices(start_size, end_size, step):
+    N = range(start_size, end_size + 1, step)
+    matrices = [np.random.rand(size, size) for size in N]
+    return matrices, np.array(N)
+
+# Misura i tempi di esecuzione della DCT2 custom per ogni matrice NxN
+def measure_custom_dct2_times(matrices):
+    times = []
+    for matrix in matrices:
+        # Se debug
+        if(debug):
+            print("[LOG DCT2 CUSTOM]: Eseguendo la DCT2 sulla Matrice {} x {}".format(matrix.shape[0], matrix.shape[1]))
+        # Timeit per un'ottima precisione
+        time_taken = timeit.timeit(lambda: dct2_custom(matrix), number=1)
+        times.append(time_taken)  
+    return times
+
+# Misura i tempi di esecuzione della DCT2 library per ogni matrice NxN
+def measure_library_dct2_times(matrices):
+    times = []
+    for matrix in matrices:
+        # Se debug
+        if debug:
+                print("[LOG DCT2 LIBRARY]: Eseguendo la DCT2 sulla Matrice {} x {}".format(matrix.shape[0], matrix.shape[1]))
+        time_taken = timeit.timeit(lambda: dct2_library(matrix), number=1)
+        times.append(time_taken)
+    return times
+
+# DEBUG
 
 # Per debugging stampa delle basi dei coseni per vedere se sono corrette
 def plot_cosine_base(base):
@@ -94,3 +151,19 @@ def write_results_to_file(dtype, result):
         file.write('Result: {}\n'.format(result))
         file.write("")
 
+def write_times_to_file(dct2_custom_times, dct2_library_times):
+    # Verifica se il file "dct_times" esiste già
+    file_name = "dct_times.txt"
+    file_exists = os.path.exists(file_name)
+    # Se il file non esiste, crea un nuovo file "dct_times.txt"
+    if not file_exists:
+        with open(file_name, "w") as file:
+            file.write("====[ TEMPI DCT2 CUSTOM E LIBRARY ]====\n\n")
+    # Scrivi i dati nella tupla nel file
+    with open(file_name, "a") as file:
+        file.write('=== { DCT2 CUSTOM } ===\n')
+        for i in range(len(dct2_custom_times)):
+            file.write('{}\n'.format(dct2_custom_times[i]))
+        file.write('=== { DCT2 LIBRARY } ===\n')
+        for i in range(len(dct2_library_times)):
+            file.write('{}\n'.format(dct2_library_times[i]))
