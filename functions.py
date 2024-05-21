@@ -3,35 +3,39 @@ import math
 from scipy.fft import dct, dctn
 import os
 import matplotlib.pyplot as plt
+import time
+
+# Per debugging
+debug = False
 
 
 def dct_custom(vector):
     # Inizializzo le variabili
     n = len(vector)
     pi = math.pi
-    dtc = []
-    cos_vect = []  
+    dtc = np.zeros(n)
+    wk = np.zeros(n)
+    cos_base = []  
     # K = 0 a n-1
     for k in range(n):
         # Vettori della base dei coseni
-        wk = []
         for i in range(n):
             # Calcolo le componenti wki come cos(pi * k * (2 * i + 1) / (2 * n))
-            wki = math.cos(pi * k * (2 * i + 1) / (2 * n))
-            # Costruisco il vettore wk
-            wk.append(wki)
-        # Normalizzazione ortho per avere il confronto con
-        # la dct della libreria
+            wk[i] = math.cos(pi * k * (2 * i + 1) / (2 * n))
+        # Normalizzazione ortho per confronto con la dct della libreria
         if k == 0:
             # Calcolo i coefficenti ak = (v * wk) / (wk * wk)
             ak = np.dot(vector, wk) / math.sqrt(n)   # wk * wk
         else:
             ak = np.dot(vector, wk) / math.sqrt(n/2) # wk * wk
-        # Salvo le basi
-        cos_vect.append(wk)
+        # Salvo la base se debug
+        if debug:
+            cos_base.append(wk)
         # Aggiungo alla lista gli ak
-        dtc.append(ak)
-    #plot_cosine_base(cos_vect)
+        dtc[k] = ak
+    # Plotto i coseni per freq k
+    if debug:
+        plot_cosine_base(cos_base)
     return dtc
 
 
@@ -89,3 +93,4 @@ def write_results_to_file(dtype, result):
         file.write('=== {} ===\n'.format(dtype))
         file.write('Result: {}\n'.format(result))
         file.write("")
+
