@@ -7,7 +7,6 @@ import timeit
 # Per debugging
 debug = True
 
-
 def dct_custom(vector):
     # Inizializzo le variabili
     n = len(vector)
@@ -62,29 +61,31 @@ def dct2_library(matrix):
 
 # Funzione per analizzare i tempi di esecuzione e generare il grafico
 def dct2_analize_graph():
-    matrices, N = generate_square_matrices(100, 300, 50)
+    matrices, N = generate_square_matrices(100, 700, 50)
     # Calcolo i tempi di esecuzione per le 2 dct2
     dct2_custom_times = measure_custom_dct2_times(matrices)
     dct2_library_times = measure_library_dct2_times(matrices)
-    # Valori di riferimento n^3 e n^2 * log(n) normalizzati
-    n3 = (N ** 3) / 1e5
-    n2_logn = (N ** 2) * np.log(N) / 1e8
-    # Se debug
-    if debug:
-        write_times_to_file(dct2_custom_times, dct2_library_times)
-    # Creo un plot semilogy (logaritmico)
-    plt.figure()
-    plt.semilogy(N, dct2_custom_times, label='DCT2 Custom', color="tab:red")
-    plt.semilogy(N, dct2_library_times, label='DCT2 Library', color="tab:blue")
-    plt.semilogy(N, n3, label='N^3', color="tab:red", linestyle='dashed')
-    plt.semilogy(N, n2_logn, label='N^2 log(N)', color="tab:blue", linestyle='dashed')
-    plt.xlabel('Dimensione della Matrice NxN')
-    plt.ylabel('Tempo in secondi')
-    plt.title('Tempi della DCT2')
+    # Curve teoriche per il confronto
+    N_cubed = N**3
+    N_squared_logN = N**2 * np.log(N)
+    # Normalizzare le curve teoriche per confrontarle con i tempi reali
+    N_cubed_normalized = N_cubed / N_cubed[-1] * dct2_custom_times[-1]
+    N_squared_logN_normalized = N_squared_logN / N_squared_logN[-1] * dct2_library_times[-1]
+    # Creazione del grafico
+    plt.figure(figsize=(10, 6))
+    plt.semilogy(N, dct2_custom_times, 'o-', label='DCT2 Custom')
+    plt.semilogy(N, dct2_library_times, 's-', label='DCT2 Libreria')
+    # Curve teoriche (tratteggiate)
+    plt.semilogy(N, N_cubed_normalized, 'k--', label='$N^3$')
+    plt.semilogy(N, N_squared_logN_normalized, 'r--', label='$N^2 \log N$')
+    # Labels
+    plt.xlabel('Dimensione N')
+    plt.ylabel('Tempo di esecuzione (s)')
+    plt.title('Confronto Tempi di Esecuzione DCT2')
     plt.legend()
     plt.grid(True)
+    # Mostra il grafico
     plt.show()
-
 
 # UTILITA'
 
