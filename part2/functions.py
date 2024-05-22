@@ -19,17 +19,24 @@ def compress_image(image, F, d):
     compressed_image = reconstruct_image(ff_blocks, image_width, image_height, F)
     return compressed_image
 
-# Suddivido in blocchi FxF l'img, scartando gli avanzi
+# Funzione per suddividere la matrice in blocchi F x F, scartando gli avanzi
 def get_blocks(matrix, image_height, image_width, F):
     blocks = []
-    # // divisione intera, soggetta a scarti
-    blocks_v= image_height // F
-    blocks_h = image_width // F
-    for i in range(blocks_v):
-        for j in range(blocks_h):
+    # Calcola il numero di blocchi verticali e orizzontali
+    num_blocks_v = image_height // F
+    num_blocks_h = image_width // F
+
+    for i in range(num_blocks_v):
+        for j in range(num_blocks_h):
+            # Calcola gli indici di inizio e fine per le righe e le colonne del blocco
+            start_row = i * F
+            end_row = (i + 1) * F
+            start_col = j * F
+            end_col = (j + 1) * F
             # Estrae il blocco F x F
-            block = matrix[i*F:(i+1)*F, j*F:(j+1)*F]
+            block = matrix[start_row:end_row, start_col:end_col]
             blocks.append(block)
+    
     return blocks
 
 # Elimino le componenti di un blocco ckl con k+l ≥ d
@@ -51,15 +58,24 @@ def idct_block(compressed_block):
     ff_byte = ff_valid.astype(np.uint8)
     return ff_byte
 
+# Funzione per ricostruire l'immagine dai blocchi F x F
 def reconstruct_image(blocks, image_width, image_height, F):
+    # Crea una nuova matrice per l'immagine
     new_image_matrix = np.zeros((image_height, image_width), dtype=np.uint8)
-    blocks_v = image_height // F
-    blocks_h = image_width // F
-    for i in range(blocks_v):
-        for j in range(blocks_h):
-            # Estrae il blocco F x F
-            new_image_matrix[i*F:(i+1)*F, j*F:(j+1)*F] = blocks[i*blocks_h + j]
-
+    # Calcola il numero di blocchi verticali e orizzontali
+    num_blocks_v = image_height // F
+    num_blocks_h = image_width // F
+    for i in range(num_blocks_v):
+        for j in range(num_blocks_h):
+            # Calcola gli indici di inizio e fine per le righe e le colonne del blocco
+            start_row = i * F       # Inizio riga blocco i
+            end_row = (i + 1) * F   # Fine riga blocco i
+            start_col = j * F       # Inizio colonna blocco j
+            end_col = (j + 1) * F   # Fine colonna blocco j
+            # Assegna il blocco F x F alla nuova matrice dell'immagine
+            # Abbiamo i blocchi salvati in ordine una lista quindi per averli possiamo fare:
+            # blocco 1 = riga 0 * blocchi in orizzontale + colonna 1 = 1 etc
+            new_image_matrix[start_row:end_row, start_col:end_col] = blocks[i * num_blocks_h + j]
     return Image.fromarray(new_image_matrix)
 
 # DCT2 della libreria
