@@ -77,6 +77,5 @@ def validate_data(d, F):
         # Controllo se F è positivo
         if F > 0:
             return True
-
     else:
         return False
