@@ -30,7 +30,7 @@ def divide_in_blocks(image_matrix, F):
     return blocks
 
 def compress_block(c, d, F):
-    compressed_block = np.zeros_like(c)
+    compressed_block = np.zeros_like(c, dtype=np.uint8)
     for k in range(F):
         for l in range(F):
             soglia = k + l
@@ -45,15 +45,15 @@ def compress_block2(c, d, F):
 
 
 # Genera una matrice 24x24 con valori casuali compresi tra 0 e 255
-image_matrix = np.random.randint(0, 256, size=(24, 24))
+image_matrix = np.random.randint(0, 256, size=(10, 10))
 print(image_matrix)
 
 # Applica la funzione divide_in_blocks alla matrice
-blocks = divide_in_blocks(image_matrix, 20)
+blocks = divide_in_blocks(image_matrix, 10)
 
 # Stampare un esempio di blocco
 print("Esempio di blocco:")
 #print(blocks[0])
 
-print(compress_block(blocks[0], 38, 20))
-print(compress_block2(blocks[0], 38, 20))
+print(compress_block(blocks[0], 3, 10))
+print(compress_block2(blocks[0], 3, 10))

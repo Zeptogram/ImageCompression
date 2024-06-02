@@ -6,6 +6,7 @@ import timeit
 
 # Per debugging
 debug = True
+show_basis = False
 
 def dct_custom(vector):
     # Inizializzo le variabili
@@ -27,13 +28,13 @@ def dct_custom(vector):
         else:
             ak = np.dot(vector, wk) / np.sqrt(n/2) # wk * wk
         # Salvo la base se debug
-        if debug:
+        if show_basis:
             cos_base.append(wk)
         # Aggiungo alla lista gli ak
         dct[k] = ak
     # Plotto i coseni per freq k
-    #if debug:
-        #plot_cosine_base(cos_base)
+    if show_basis:
+        plot_cosine_base(cos_base)
     return dct
 
 def dct2_custom(matrix):
@@ -65,6 +66,9 @@ def dct2_analize_graph():
     # Calcolo i tempi di esecuzione per le 2 dct2
     dct2_custom_times = measure_custom_dct2_times(matrices)
     dct2_library_times = measure_library_dct2_times(matrices)
+    # Scrivo su file i tempi
+    if debug:
+        write_times_to_file(dct2_custom_times, dct2_library_times)
     # Curve teoriche per il confronto
     N_cubed = N**3
     N_squared_logN = N**2 * np.log(N)

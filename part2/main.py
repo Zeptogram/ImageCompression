@@ -89,7 +89,7 @@ def save_image():
 
 # Creazione della finestra principale
 root = tk.Tk()
-root.title("Selezione Immagine e Parametri DCT2")
+root.title("Selezione Immagine e Parametri per la Compressione")
 
 # Dimensioni della finestra
 window_width = 1000
