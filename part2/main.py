@@ -81,8 +81,8 @@ def process_image(F_entry, d_entry, img_label, proc_img_label):
 def get_resized_dimensions(image):
     window_height = root.winfo_height()
     window_width = root.winfo_width()
-    max_height = window_height * 1.9 // 3  # Usa i due terzi dell'altezza della finestra
-    max_width = window_width // 2.1  # Usa metà della larghezza della finestra
+    max_height = window_height * 1.9 // 3  
+    max_width = window_width // 2.1 
     original_width, original_height = image.size
     ratio = min(max_height / original_height, max_width / original_width)
     new_width = int(original_width * ratio)
