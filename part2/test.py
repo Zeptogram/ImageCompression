@@ -13,47 +13,18 @@ matrix = [
     [87, 149, 57, 192, 65, 129, 178, 228]
 ]
 
-
-print(dctn(matrix, 2, norm="ortho"))
-
-def divide_in_blocks(image_matrix, F):
-    image_height, image_width = image_matrix.shape
-    blocks = []
-    num_blocks_vert = image_height // F
-    num_blocks_horiz = image_width // F
-    
-    for i in range(num_blocks_vert):
-        for j in range(num_blocks_horiz):
-            block = image_matrix[i*F:(i+1)*F, j*F:(j+1)*F]
-            blocks.append(block)
-    
-    return blocks
-
-def compress_block(c, d, F):
-    compressed_block = np.zeros_like(c, dtype=np.uint8)
-    for k in range(F):
-        for l in range(F):
-            soglia = k + l
-            if soglia < d:
-                compressed_block[k][l] = c[k][l]
-
-    return compressed_block
-
-def compress_block2(c, d, F):
-    compressed_block = c * (np.abs(np.add.outer(range(F), range(F))) < d)
-    return compressed_block
+result_expected = [
+    [1.11e+03, 4.40e+01, 7.59e+01, -1.38e+02, 3.50e+00, 1.22e+02, 1.95e+02, -1.01e+02],
+    [7.71e+01, 1.14e+02, -2.18e+01, 4.13e+01, 8.77e+00, 9.90e+01, 1.38e+02, 1.09e+01],
+    [4.48e+01, -6.27e+01, 1.11e+02, -7.63e+01, 1.24e+02, 9.55e+01, -3.98e+01, 5.85e+01],
+    [-6.99e+01, -4.02e+01, -2.34e+01, -7.67e+01, 2.66e+01, -3.68e+01, 6.61e+01, 1.25e+02],
+    [-1.09e+02, -4.33e+01, -5.55e+01, 8.17e+00, 3.02e+01, -2.86e+01, 2.44e+00, -9.41e+01],
+    [-5.38e+00, 5.66e+01, 1.73e+02, -3.54e+01, 3.23e+01, 3.34e+01, -5.81e+01, 1.90e+01],
+    [7.88e+01, -6.45e+01, 1.18e+02, -1.50e+01, -1.37e+02, -3.06e+01, -1.05e+02, 3.98e+01],
+    [1.97e+01, -7.81e+01, 9.72e-01, -7.23e+01, -2.15e+01, 8.13e+01, 6.37e+01, 5.90e+00]
+]
 
 
-# Genera una matrice 24x24 con valori casuali compresi tra 0 e 255
-image_matrix = np.random.randint(0, 256, size=(10, 10))
-print(image_matrix)
-
-# Applica la funzione divide_in_blocks alla matrice
-blocks = divide_in_blocks(image_matrix, 10)
-
-# Stampare un esempio di blocco
-print("Esempio di blocco:")
-#print(blocks[0])
-
-print(compress_block(blocks[0], 3, 10))
-print(compress_block2(blocks[0], 3, 10))
+result_real = dctn(matrix, 2, norm="ortho")
+print("========================== Risultato della DCT2 Ottenuto ===============================")
+print(result_real)
