@@ -1,7 +1,31 @@
+"""
+    FILE FUNCTIONS.PY 
+
+    AUTORI: 
+    - Biancini Mattia 865966
+    - Gargiulo Elio 869184
+
+    DESCRIZIONE:
+    File principale del progetto.
+    Contiene tutte le funzioni necessarie alla compressione dell'immagine,
+    a partire dalla divisione in blocchi FxF, applicazione della dct2 ad ogni blocco,
+    rimozione delle frequenze, idct2 e ricostruzione dell'immagine compressa.
+
+"""
+
 import numpy as np
 from scipy.fft import dctn, idctn
 from PIL import Image
 
+# Validazione input
+def validate_data(d, F):
+    # Controllo se la d è corretta
+    if 0 <= d <= 2 * F - 2:
+        # Controllo se F è positivo
+        if F > 0:
+            return True
+    else:
+        return False
 
 # Effettuo tutte le operazioni per comprimere l'img
 def compress_image(image, F, d):
@@ -85,13 +109,3 @@ def dct2(matrix):
 # IDCT2 della libreria
 def idct2(matrix):
     return idctn(matrix, norm='ortho')
-
-# Validazione input
-def validate_data(d, F):
-    # Controllo se la d è corretta
-    if 0 <= d <= 2 * F - 2:
-        # Controllo se F è positivo
-        if F > 0:
-            return True
-    else:
-        return False
