@@ -8,7 +8,7 @@
     DESCRIZIONE:
     File ui del progetto. 
     Contiene le funzioni necessarie per la creazione della ui con la
-    liberia tkinter, il passaggio dei parametri necessari e esecuzione della
+    liberia tkinter, il passaggio dei parametri necessari ed esecuzione della
     compressione dell'immagine bitmap.
 
 """
