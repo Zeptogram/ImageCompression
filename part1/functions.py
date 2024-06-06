@@ -6,7 +6,7 @@ import timeit
 
 # Per debugging
 debug = True
-show_basis = False
+
 
 def dct_custom(vector):
     # Inizializzo le variabili
@@ -14,7 +14,7 @@ def dct_custom(vector):
     pi = np.pi
     dct = np.zeros(n)
     wk = np.zeros(n)
-    cos_base = []  
+    cos_base = []
     # K = 0 a n-1
     for k in range(n):
         # Vettori della base dei coseni
@@ -23,19 +23,20 @@ def dct_custom(vector):
             wk[i] = np.cos(pi * k * (2 * i + 1) / (2 * n))
         # Normalizzazione ortho per confronto con la dct della libreria
         if k == 0:
-            # Calcolo i coefficenti ak = (v * wk) / (wk * wk)
-            ak = np.dot(vector, wk) / np.sqrt(n)   # wk * wk
+            # Calcolo i coefficienti ak = (v * wk) / (wk * wk)
+            ak = np.dot(vector, wk) / np.sqrt(n)  # wk * wk
         else:
-            ak = np.dot(vector, wk) / np.sqrt(n/2) # wk * wk
+            ak = np.dot(vector, wk) / np.sqrt(n / 2)  # wk * wk
         # Salvo la base se debug
-        if show_basis:
+        if debug:
             cos_base.append(wk)
         # Aggiungo alla lista gli ak
         dct[k] = ak
     # Plotto i coseni per freq k
-    if show_basis:
-        plot_cosine_base(cos_base)
+    # if debug:
+    # plot_cosine_base(cos_base)
     return dct
+
 
 def dct2_custom(matrix):
     # Creo una matrice di appoggio
@@ -47,13 +48,15 @@ def dct2_custom(matrix):
     dct_matrix_col = dct_matrix_row.T
     for i in range(len(dct_matrix_col)):
         dct_matrix_col[i, :] = dct_custom(dct_matrix_col[i, :])
-    # Rifaccio la traposta e ritorno la matrice
+    # Rifaccio la trasposta e ritorno la matrice
     return dct_matrix_col.T
+
 
 # DCT di SciPy
 def dct_library(vector):
     # Equivalente a dct di matlab
     return dct(vector, 2, norm='ortho')
+
 
 # DCT2 di SciPy
 def dct2_library(matrix):
@@ -61,17 +64,14 @@ def dct2_library(matrix):
 
 
 # Funzione per analizzare i tempi di esecuzione e generare il grafico
-def dct2_analize_graph():
+def dct2_analyze_graph():
     matrices, N = generate_square_matrices(100, 700, 50)
-    # Calcolo i tempi di esecuzione per le 2 dct2
-    dct2_custom_times = measure_custom_dct2_times(matrices)
-    dct2_library_times = measure_library_dct2_times(matrices)
-    # Scrivo su file i tempi
-    if debug:
-        write_times_to_file(dct2_custom_times, dct2_library_times)
+    # Calcolo i tempi di esecuzione per le due dct2
+    dct2_custom_times = measure_dct2_times(matrices, dct2_custom, True)
+    dct2_library_times = measure_dct2_times(matrices, dct2_library, False)
     # Curve teoriche per il confronto
-    N_cubed = N**3
-    N_squared_logN = N**2 * np.log(N)
+    N_cubed = N ** 3
+    N_squared_logN = N ** 2 * np.log(N)
     # Normalizzare le curve teoriche per confrontarle con i tempi reali
     N_cubed_normalized = N_cubed / N_cubed[-1] * dct2_custom_times[-1]
     N_squared_logN_normalized = N_squared_logN / N_squared_logN[-1] * dct2_library_times[-1]
@@ -91,6 +91,7 @@ def dct2_analize_graph():
     # Mostra il grafico
     plt.show()
 
+
 # UTILITA'
 
 # Genera matrici NxN casuali di dimensione N = start_size fino a end_size aumentando con step
@@ -99,26 +100,19 @@ def generate_square_matrices(start_size, end_size, step):
     matrices = [np.random.rand(size, size) for size in N]
     return matrices, np.array(N)
 
-# Misura i tempi di esecuzione della DCT2 custom per ogni matrice NxN
-def measure_custom_dct2_times(matrices):
-    times = []
-    for matrix in matrices:
-        # Se debug
-        if(debug):
-            print("[LOG DCT2 CUSTOM]: Eseguendo la DCT2 sulla Matrice {} x {}".format(matrix.shape[0], matrix.shape[1]))
-        # Timeit per un'ottima precisione
-        time_taken = timeit.timeit(lambda: dct2_custom(matrix), number=1)
-        times.append(time_taken)  
-    return times
 
-# Misura i tempi di esecuzione della DCT2 library per ogni matrice NxN
-def measure_library_dct2_times(matrices):
+# Misura i tempi di esecuzione della DCT2 custom per ogni matrice NxN
+def measure_dct2_times(matrices, function, custom=True):
     times = []
     for matrix in matrices:
         # Se debug
         if debug:
+            if custom:
+                print("[LOG DCT2 CUSTOM]: Eseguendo la DCT2 sulla Matrice {} x {}".format(matrix.shape[0], matrix.shape[1]))
+            else:
                 print("[LOG DCT2 LIBRARY]: Eseguendo la DCT2 sulla Matrice {} x {}".format(matrix.shape[0], matrix.shape[1]))
-        time_taken = timeit.timeit(lambda: dct2_library(matrix), number=1)
+        # Timeit per un'ottima precisione
+        time_taken = timeit.timeit(lambda: function(matrix), number=1)
         times.append(time_taken)
     return times
 
@@ -142,6 +136,7 @@ def plot_cosine_base(base):
     plt.tight_layout()
     plt.show()
 
+
 def write_results_to_file(dtype, result):
     # Verifica se il file "dct_results" esiste già
     file_name = "dct_results.txt"
@@ -155,6 +150,7 @@ def write_results_to_file(dtype, result):
         file.write('=== {} ===\n'.format(dtype))
         file.write('Result: {}\n'.format(result))
         file.write("")
+
 
 def write_times_to_file(dct2_custom_times, dct2_library_times):
     # Verifica se il file "dct_times" esiste già
