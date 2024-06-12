@@ -64,7 +64,7 @@ def dct2_library(matrix):
 
 # Funzione per analizzare i tempi di esecuzione e generare il grafico
 def dct2_analyze_graph():
-    matrices, N = generate_square_matrices(100, 700, 50)
+    matrices, N = generate_square_matrices(40, 5)
     # Calcolo i tempi di esecuzione per le due dct2
     dct2_custom_times = measure_dct2_times(matrices, dct2_custom, True)
     dct2_library_times = measure_dct2_times(matrices, dct2_library, False)
@@ -90,17 +90,19 @@ def dct2_analyze_graph():
     plt.title('Confronto Tempi di Esecuzione DCT2')
     plt.legend()
     plt.grid(True)
+    plt.xticks(N)
     # Mostra il grafico
     plt.show()
 
 
 # UTILITA'
 
-# Genera matrici NxN casuali di dimensione N = start_size fino a end_size aumentando con step
-def generate_square_matrices(start_size, end_size, step):
-    N = range(start_size, end_size + 1, step)
-    matrices = [np.random.rand(size, size) for size in N]
-    return matrices, np.array(N)
+# Genera matrici NxN casuali di dimensione start_size fino a num_doublings raddoppiando in volta
+def generate_square_matrices(start_size, num_doublings):
+    sizes = [start_size * 2 ** i for i in range(num_doublings)]
+    matrices = [np.random.rand(size, size) for size in sizes]
+    return matrices, np.array(sizes)
+
 
 
 # Misura i tempi di esecuzione della DCT2 custom per ogni matrice NxN
