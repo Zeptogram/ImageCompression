@@ -69,7 +69,8 @@ def process_image(F_entry, d_entry, img_label, proc_img_label):
         # Crea un'immagine nera se d è 0, altrimenti comprimi l'immagine
         if d == 0:
             width, height = selected_image.size
-            processed_image = Image.new('RGB', (width, height), (0, 0, 0))
+            # Utilizzo le dimensioni considerando il taglio dei blocchi
+            processed_image = Image.new('L', (F * (width // F), F * (height // F)), (0))
         else:
             processed_image = compress_image(selected_image, F, d)
         # Ridimensiona l'immagine elaborata per la visualizzazione

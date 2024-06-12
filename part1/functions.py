@@ -6,7 +6,7 @@ import timeit
 
 # Per debugging
 debug = True
-
+show_basis = False
 
 def dct_custom(vector):
     # Inizializzo le variabili
@@ -14,7 +14,7 @@ def dct_custom(vector):
     pi = np.pi
     dct = np.zeros(n)
     wk = np.zeros(n)
-    cos_base = []
+    cos_base = []  
     # K = 0 a n-1
     for k in range(n):
         # Vettori della base dei coseni
@@ -23,20 +23,19 @@ def dct_custom(vector):
             wk[i] = np.cos(pi * k * (2 * i + 1) / (2 * n))
         # Normalizzazione ortho per confronto con la dct della libreria
         if k == 0:
-            # Calcolo i coefficienti ak = (v * wk) / (wk * wk)
-            ak = np.dot(vector, wk) / np.sqrt(n)  # wk * wk
+            # Calcolo i coefficenti ak = (v * wk) / (wk * wk)
+            ak = np.dot(vector, wk) / np.sqrt(n)   # wk * wk
         else:
-            ak = np.dot(vector, wk) / np.sqrt(n / 2)  # wk * wk
+            ak = np.dot(vector, wk) / np.sqrt(n/2) # wk * wk
         # Salvo la base se debug
-        if debug:
+        if show_basis:
             cos_base.append(wk)
         # Aggiungo alla lista gli ak
         dct[k] = ak
     # Plotto i coseni per freq k
-    # if debug:
-    # plot_cosine_base(cos_base)
+    if show_basis:
+        plot_cosine_base(cos_base)
     return dct
-
 
 def dct2_custom(matrix):
     # Creo una matrice di appoggio
@@ -69,6 +68,9 @@ def dct2_analyze_graph():
     # Calcolo i tempi di esecuzione per le due dct2
     dct2_custom_times = measure_dct2_times(matrices, dct2_custom, True)
     dct2_library_times = measure_dct2_times(matrices, dct2_library, False)
+    # Scrivo su file i tempi
+    if debug:
+        write_times_to_file(dct2_custom_times, dct2_library_times)
     # Curve teoriche per il confronto
     N_cubed = N ** 3
     N_squared_logN = N ** 2 * np.log(N)
