@@ -29,7 +29,7 @@ def dct_custom(vector):
             ak = np.dot(vector, wk) / np.sqrt(n/2) # wk * wk
         # Salvo la base se debug
         if show_basis:
-            cos_base.append(wk)
+            cos_base.append(wk.copy())
         # Aggiungo alla lista gli ak
         dct[k] = ak
     # Plotto i coseni per freq k
@@ -135,7 +135,7 @@ def plot_cosine_base(base):
         axes[row, col].bar(range(n), wk, label=f'k={i}')
         axes[row, col].set_xlabel('Indice i fino a n')
         axes[row, col].set_ylabel('Valore')
-        axes[row, col].set_title(f'Basi dei Coseni per k={i} oscillazioni')
+        axes[row, col].set_title(f'Basi dei Coseni, k={i} oscillazioni')
         axes[row, col].legend()
     plt.tight_layout()
     plt.show()
