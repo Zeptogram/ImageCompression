@@ -33,7 +33,7 @@ Download the documentation for detailed info about the whole project (only in It
 - Mattia Biancini
 - Elio Gargiulo
 
-## Resources
+## Useful Resources
 - SciPy DCT: [docs](https://docs.scipy.org/doc/scipy/reference/generated/scipy.fftpack.dct.html)
 - DCT: [wiki](https://en.wikipedia.org/wiki/Discrete_cosine_transform)
 - JPEG Compression: [wiki](https://en.wikipedia.org/wiki/JPEG)
