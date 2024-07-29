@@ -26,7 +26,7 @@ Each project consists of two files:
 - `functions.py` which collects all the functions we used as if it were a library for our project
 - `main.py` executable of the related sub-project
 
-
+Download the documentation for detailed info about the whole project (only in Italian). 
 
 ## Authors
 
